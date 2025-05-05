@@ -8,32 +8,36 @@ async function handleSubmit(event) {
   button.textContent = "Loading...";
   button.disabled = true;
 
-  const response = await fetch("https://url-shortener-backend-sable.vercel.app/createShortUrl", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "GET, POST",
-    },
-    body: JSON.stringify({ original_url: urlInput }),
-  });
+  try {
+    const response = await fetch("https://url-shortener-backend-sable.vercel.app/createShortUrl", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST",
+      },
+      body: JSON.stringify({ original_url: urlInput }),
+    });
 
-  button.textContent = "Create New Url";
-  button.disabled = false;
+    if (response.ok) {
+      const result = await response.json();
 
-  if (response.ok) {
-    const result = await response.json();
+      shortUrl.classList.add("text-green-500");
+      shortUrl.href = result.new_url;
+      shortUrl.innerHTML = result.new_url;
+      shortUrl.target = "_blank";
+      return;
+    }
 
-    shortUrl.classList.add("text-green-500");
-    shortUrl.href = result.new_url;
-    shortUrl.innerHTML = result.new_url;
-    shortUrl.target = "_blank";
-    return;
+    throw new Error();
+  } catch {
+    shortUrl.innerHTML = "Failed to create new url";
+    shortUrl.target = "_self";
+  } finally {
+    button.textContent = "Create New Url";
+    button.disabled = false;
   }
-
-  shortUrl.innerHTML = "Failed to create new url";
-  shortUrl.target = "_self";
 }
 
 document.addEventListener("DOMContentLoaded", () => {
