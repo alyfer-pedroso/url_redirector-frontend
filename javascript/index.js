@@ -13,7 +13,7 @@ async function handleSubmit(event) {
   submitButton.disabled = true;
 
   try {
-    const response = await fetch("https://urly-719714d4ba22.herokuapp.com/createShortUrl", {
+    const response = await fetch("https://alyurl.fun/createShortUrl", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
