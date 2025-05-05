@@ -14,8 +14,6 @@ async function handleSubmit(event) {
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "GET, POST",
       },
       body: JSON.stringify({ original_url: urlInput }),
     });
