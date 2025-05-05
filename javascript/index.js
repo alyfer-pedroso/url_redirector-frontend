@@ -1,12 +1,16 @@
 async function handleSubmit(event) {
   event.preventDefault();
 
-  const urlInput = document.getElementById("url").value;
-  const shortUrl = document.getElementById("shortUrl");
-  const button = document.getElementById("submit");
+  const urlInput = document.getElementById("url").value.trim();
+  const shortUrlDisplay = document.getElementById("shortUrl");
+  const submitButton = document.getElementById("submit");
 
-  button.textContent = "Loading...";
-  button.disabled = true;
+  shortUrlDisplay.textContent = "";
+  shortUrlDisplay.removeAttribute("href");
+  shortUrlDisplay.classList.remove("text-green-500", "text-red-500");
+
+  submitButton.textContent = "Loading...";
+  submitButton.disabled = true;
 
   try {
     const response = await fetch("https://url-shortener-backend-sable.vercel.app/createShortUrl", {
@@ -14,33 +18,34 @@ async function handleSubmit(event) {
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "POST",
-        "Access-Control-Allow-Headers": "Content-Type",
       },
       body: JSON.stringify({ original_url: urlInput }),
     });
 
-    if (response.ok) {
-      const result = await response.json();
-
-      shortUrl.classList.add("text-green-500");
-      shortUrl.href = result.new_url;
-      shortUrl.innerHTML = result.new_url;
-      shortUrl.target = "_blank";
-      return;
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
     }
 
-    throw new Error();
-  } catch {
-    shortUrl.innerHTML = "Failed to create new url";
-    shortUrl.target = "_self";
+    const result = await response.json();
+
+    shortUrlDisplay.classList.add("text-green-500");
+    shortUrlDisplay.href = result.new_url;
+    shortUrlDisplay.textContent = result.new_url;
+    shortUrlDisplay.target = "_blank";
+  } catch (error) {
+    shortUrlDisplay.classList.add("text-red-500");
+    shortUrlDisplay.textContent = "Failed to create short URL. Please try again.";
+    shortUrlDisplay.removeAttribute("target");
+    console.error("URL shortening failed:", error);
   } finally {
-    button.textContent = "Create New Url";
-    button.disabled = false;
+    submitButton.textContent = "Create New URL";
+    submitButton.disabled = false;
   }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  document.querySelector("form")?.addEventListener("submit", handleSubmit);
+  const form = document.querySelector("form");
+  if (form) {
+    form.addEventListener("submit", handleSubmit);
+  }
 });
